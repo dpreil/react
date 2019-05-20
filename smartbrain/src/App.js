@@ -6,6 +6,7 @@ import particleOptions from './particles';
 import TiltBox from './tiltbox';
 //import Tilt from 'react-vanilla-tilt';
 import InputField from './inputField';
+import ImageBox from './imagebox';
 
 
 class App extends Component {
@@ -35,9 +36,9 @@ class App extends Component {
       <div className="App">
         <Particles className='particles' params={particleOptions}/>
         <TiltBox/>
+ 
         <InputField getIMG={this.getImg} submitImage={this.submitImage}/>
-        <div>'\n'</div>
-        <div>{this.state.imgURL}</div>
+        <ImageBox ImgUrl = {this.state.imgURL}/>
         
       </div>
     );
