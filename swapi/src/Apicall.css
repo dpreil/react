@@ -1,0 +1,16 @@
+@font-face {
+font-family: 'SW Font';
+font-style: normal;
+font-weight: normal;
+src: local('SW Font'), url('starjedi.ttf') format('truetype');
+}
+
+.div1 {
+   font-family: 'SW Font';
+}
+
+.listItem {
+	font-family: 'SW Font';
+	text-decoration: line-through;
+}
+
