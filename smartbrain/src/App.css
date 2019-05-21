@@ -9,6 +9,12 @@
 
 }
 
+.CoreApp {
+  text-align: center;
+  height:100%;
+  width:100%;
+}
+
 .particles {
   height:100%;
   width:100%;
@@ -91,5 +97,30 @@
    
 }
 
+.signInBox{
+    
+    border-width: 0px;
+    margin: 20px 40px 20px 40px;
+    position: absolute;
+    top: 25%;
+    left:50%;
+    width:30%;
+    height:60%;
+    margin: 0 0 0 -15%;
+}
 
+.signInForm{
+    display: flex;
+    flex-direction: column;
+    align-content: center;
+    align-items: center;
+    height:100%;
 
+}
+
+.logout{
+  width:100px;
+  position:relative;
+  top:4%;
+  left:90%;
+}

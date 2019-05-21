@@ -5,7 +5,7 @@ const InputBar = ({getIMG, submitImage}) => {
 	
 			
 				<input
-						className='pa2 ba inputBar'
+						className='pa1 ba inputBar'
 						type='search'
 						placeholder='Please enter an image url'
 						onChange={getIMG}

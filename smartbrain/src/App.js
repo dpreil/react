@@ -1,47 +1,95 @@
 import React, {Component} from 'react';
 //import logo from './logo.svg';
 import './App.css';
-import Particles from 'react-particles-js';
-import particleOptions from './particles';
-import TiltBox from './tiltbox';
-//import Tilt from 'react-vanilla-tilt';
-import InputField from './inputField';
-import ImageBox from './imagebox';
+ 
+// import TiltBox from './tiltbox';
+// //import Tilt from 'react-vanilla-tilt';
+// import InputField from './inputField';
+// import ImageBox from './imagebox';
+import ImageReader from './imageReader';
+import SignIn from './signin';
+import Register from './register';
+
 
 
 class App extends Component {
   constructor (props){
     super(props);
     this.state = {
-      imgURL: '',
+      register:false,
+      email:'',
+      password:'',
+      passwordCheck:'',
+      loggedin:true,
+      }
     }
 
-  }
+    getEmail = (e) => {
+      this.setState({email:e.target.value})
+    }
 
-  getImg = (event) => {
-    event.preventDefault();
-    console.log(event.target.value);
-    this.setState({imgURL:event.target.value});
-  }
+    getPassword = (e) => {
+      this.setState({password:e.target.value})
+    }
 
-  submitImage = (e) => {
-    e.preventDefault();
-    //submit image for rendering and processing
-    // I know enough to render in new div. need to fix use Input Field 
-  }
+    getPasswordCheck = (e) => {
+      this.setState({passwordCheck:e.target.value})
+    }
+
+    submitDetails = (e) => {
+      alert("click!!")
+    }
+
+    register = (e) => {
+      e.preventDefault();
+      this.setState({register:true});
+    }
+
+    submitRegistration = (e) => {
+      e.preventDefault();
+      alert("Registered!")
+    }
+
+    logout = (e) => {
+      e.preventDefault();
+      this.setState({loggedin:false});
+    }
 
   render(){
-
-    return (
-      <div className="App">
-        <Particles className='particles' params={particleOptions}/>
-        <TiltBox/>
- 
-        <InputField getIMG={this.getImg} submitImage={this.submitImage}/>
-        <ImageBox ImgUrl = {this.state.imgURL}/>
-        
-      </div>
-    );
+    if(this.state.loggedin === false){
+      if(this.state.register === false){
+        return(
+          <div className = "App">
+            <div className='signInBox'>
+              <SignIn className='signIn'
+              email = {this.state.email}
+              password = {this.state.password}
+              submitEmail = {this.getEmail}
+              submitPassword = {this.getPassword}
+              click = {this.submitDetails}
+              register = {this.register} />
+            </div>
+          </div>)
+      } else {
+        return (<div className = "App">
+                  <div className='signInBox'>
+                    <Register className='signIn'
+                      email = {this.state.email}
+                      password = {this.state.password}
+                      passwordCheck = {this.state.passwordCheck}
+                      submitEmail = {this.getEmail}
+                      submitPassword = {this.getPassword}
+                      submitPasswordCheck = {this.getPasswordCheck}
+                      click = {this.submitRegistration}
+                       />
+                </div>
+              </div>)}
+      } else { 
+      return (
+        <div className='CoreApp'>
+          <ImageReader className = 'CoreApp' logout={this.logout}/>
+        </div>
+    );}
   }
 }
 
