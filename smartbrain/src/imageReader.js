@@ -21,6 +21,9 @@ class ImageReader extends Component {
     }
     this.app = new Clarifai.App({apiKey:'37ee56e7f2144e0d873763d314893fa5'});
   }
+  componentDidUpdate(){
+    console.log(this.props.id);
+  }
   
 
 
@@ -36,22 +39,24 @@ class ImageReader extends Component {
     .then((response) => {
       const path = response.outputs[0].data.regions[0].region_info.bounding_box;
      // console.log(path);
-      this.setState({box:path});
+      this.setState({box:path});})
 
-    }, (err) => {
-
-    })
-
-    //submit image for rendering and processing
-    // I know enough to render in new div. need to fix use Input Field 
-  }
+    fetch('http://localhost:3001/image', {
+          method: 'PUT',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify(this.props)
+        })
+        .then(res=>res.json())
+        .then(res => console.log(res))
+        .catch(err => console.log(err))
+    }
 
   render(){
 
     return (
       <div className="CoreApp">
         <TiltBox/>
- 
+        <div className="welcome">Welcome {this.props.name}. Your rank is #5.</div>
         <InputField getIMG={this.getImg} submitImage={this.submitImage}/>
         <ImageBox ImgUrl = {this.state.imgURL} box={this.state.box}/>
         <Logout logout={this.props.logout}/>

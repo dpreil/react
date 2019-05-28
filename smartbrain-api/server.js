@@ -1,28 +1,22 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const bCrypt = require('bcryptjs');
+const knex = require('knex');
+const cors = require('cors');
 
 const app = express();
 app.use(bodyParser.json());
+app.use(cors());
 
-var database = [
-	{
-		id: 101,
-		name: 'John',
-		email: 'j@gmail.com',
-		password: 'apples',
-		entries: 0,
-		joined: new Date()
-	},
-	{
-		id: 102,
-		name: 'Bob',
-		email: 'bob@gmail.com',
-		password: 'bobstheman',
-		entries:2,
-		joined: new Date()
-	}
-]
+const db = knex({
+  client: 'pg',
+  connection: {
+    host : '127.0.0.1',
+    user : '',
+    password : '',
+    database : 'smartbrain'
+  }
+});
 
 app.get('/', (req,res)=>{
 	res.send("this is working")
@@ -30,72 +24,84 @@ app.get('/', (req,res)=>{
 
 app.get('/profile/:id', (req,res) => {
 	const {id} = req.params;
-	var found = false;
-	database.forEach(user => {
-		if (user.id === parseInt(id,10)){
-			found=true;
-			res.json(user);
-		}} )
-		if(!found) {
-			res.status(404).json("please reenter username and password")
-		}
-})
+	db('users').select('*')
+	.where({id})
+	.then(user => {
+		if(user.length){
+		res.json(user[0]);
+		} else { throw error}
+		})
+		.catch (err => res.status(400).json('user not found'))
+	})
 
 app.put('/image', (req,res) => {
 	const id = parseInt(req.body.id);
-	var found = false;
-	database.forEach(user => {
-		if (user.id === parseInt(id,10)){
-			found=true;
-			user.entries++;
-			res.json('count updated');
-		}} )
-		if(!found) {
-			res.status(404).json("please reenter username and password")
-		}})
+	console.log(id);
+	db('users').where('id','=',id)
+	.increment('entries',1)
+	.returning('entries')
+	.then(()=> res.json('entries updated'))
+	.catch(err => res.status(400).json('unable to process entry'))})
+
+	// database.forEach(user => {
+	// 	if (user.id === parseInt(id,10)){
+	// 		found=true;
+	// 		user.entries++;
+	// 		res.json('count updated');
+	// 	}} )
+	// 	if(!found) {
+	// 		res.status(404).json("please reenter username and password")
+	// 	}})
 
 
 app.post('/signin', (req,res) => {
-	var found = false;
-	for (entry in database){
-		if(req.body.email === database[entry].email){
-			console.log("email match!")
-			found=true;
-			bCrypt.compare(req.body.password,database[entry].password,(err,hashRes)=>{
-				if (hashRes){
-					console.log("Password match!")
-					res.json(database[entry]);
-					found = true;
-				} else {
-					res.json("please reenter your email and password")
-					console.log('password doesn\'t match');
-				}
-		})
-		break;
-	}} 
-	console.log(found);
-	if (!found){
-		found=false;
-		res.json("please reenter your email and password")
-	}
-})
+	const {email,password} = req.body;
+	db.select('email','hash').from('logins').where({email:email})
+	.then(data => {
+		if(data.length){
+			bCrypt.compare(password,data[0].hash,(err,hashRes)=>{
+					if (hashRes){
+					//	var userData = {"name":"","entries":"0"};
+						db.select('name','entries').from('users').where({email:email})
+						.then(data =>{
+							res.json({
+							"match":"match",
+							"name":data[0].name,
+							"entries":data[0].entries,
+						})});
+						}})
+					} else {
+						res.json("please reenter your email and password")
+						console.log('password doesn\'t match');
+					}})
+	})
+
 
 app.post('/register', (req,res) => {
 	const {name, email, password} = req.body;
-	let hashedPW = '';
 	bCrypt.hash(password, 10).then(hash => {
-		database.push({
-		id: database[database.length-1].id+1,
-		name: name,
-		email: email,
-		password: hash,
-		entries: 0,
-		joined: new Date()
-		})
-	}).then(res.json("Registration completed succesfully!"));
+		db.transaction(trx => {
+			trx.insert({email:email, hash:hash})
+			.into("logins")
+			.then(()=>{
+				return trx.insert({
+					name:name,
+					email:email,
+					entries:0,
+					date_joined:new Date()
+				})
+				.into('users')
+			})
+			.then(()=>{
+				trx.commit();
+				res.json("registration successful")})
+			.catch(trx.rollback)
+		}).catch(err => res.status(400).json("Registration failed."))
+	})
 })
 
-app.listen(3000,()=>console.log("listening on port 3000"))
+
+app.listen(3001,()=>console.log("listening on port 3001"))
 
 
 /* End-points

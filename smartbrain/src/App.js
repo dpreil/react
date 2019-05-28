@@ -16,16 +16,23 @@ class App extends Component {
   constructor (props){
     super(props);
     this.state = {
+      name:'',
       register:false,
       email:'',
       password:'',
       passwordCheck:'',
-      loggedin:true,
+      loggedin:false,
+      userID:0,
+      entries:0
       }
     }
 
+    getName = (e) => {
+      this.setState({name:e.target.value})
+    }
+
     getEmail = (e) => {
-      this.setState({email:e.target.value})
+      this.setState({email:e.target.value});
     }
 
     getPassword = (e) => {
@@ -36,25 +43,76 @@ class App extends Component {
       this.setState({passwordCheck:e.target.value})
     }
 
-    submitDetails = (e) => {
-      alert("click!!")
-    }
-
     register = (e) => {
       e.preventDefault();
-      this.setState({register:true});
+      this.setState({
+        register:true,
+        password:'',
+        email:''});
     }
 
     submitRegistration = (e) => {
       e.preventDefault();
-      alert("Registered!")
-    }
+      if (this.state.password === this.state.passwordCheck){
+        //register user
+        fetch('http://localhost:3001/register', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({
+            email: this.state.email,
+            password:this.state.password,
+            name:this.state.name
+          })
+        }).then(res=>res.json())
+        .then(res => {
+          console.log(res);
+            if(res){
+              this.setState({
+                  loggedin:true,
+                  password:'',
+                  passwordCheck:'',
+                  userID:res.id,
+                })}
+            })
+        .then(()=>console.log(this.state))
+        .catch(err => console.log(err));
+    }}
 
     logout = (e) => {
       e.preventDefault();
-      this.setState({loggedin:false});
+      this.setState({
+        name:'',
+        register:false,
+        email:'',
+        password:'',
+        passwordCheck:'',
+        loggedin:false,
+        userID:0,
+        entries:0
+        });
     }
 
+    submitLogin = (e) => {
+      e.preventDefault();
+      fetch('http://localhost:3001/signin', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({
+            email: this.state.email,
+            password:this.state.password
+          })
+        }).then(res=>res.json())
+      .then(res => {
+        if(res.match==='match')
+          {
+            this.setState({
+              loggedin:true,
+              name:res.name
+              })
+            console.log(res);
+      }})
+      .then(() => console.log(this.state.loggedin))
+}
   render(){
     if(this.state.loggedin === false){
       if(this.state.register === false){
@@ -66,7 +124,7 @@ class App extends Component {
               password = {this.state.password}
               submitEmail = {this.getEmail}
               submitPassword = {this.getPassword}
-              click = {this.submitDetails}
+              click = {this.submitLogin}
               register = {this.register} />
             </div>
           </div>)
@@ -74,9 +132,11 @@ class App extends Component {
         return (<div className = "App">
                   <div className='signInBox'>
                     <Register className='signIn'
+                      name = {this.state.name}
                       email = {this.state.email}
                       password = {this.state.password}
                       passwordCheck = {this.state.passwordCheck}
+                      submitName = {this.getName}
                       submitEmail = {this.getEmail}
                       submitPassword = {this.getPassword}
                       submitPasswordCheck = {this.getPasswordCheck}
@@ -87,7 +147,7 @@ class App extends Component {
       } else { 
       return (
         <div className='CoreApp'>
-          <ImageReader className = 'CoreApp' logout={this.logout}/>
+          <ImageReader className = 'CoreApp' name={this.state.name} id={this.state.userID} logout={this.logout}/>
         </div>
     );}
   }
