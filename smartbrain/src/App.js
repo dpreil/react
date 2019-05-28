@@ -107,7 +107,8 @@ class App extends Component {
           {
             this.setState({
               loggedin:true,
-              name:res.name
+              name:res.name, 
+              entries:res.entries,
               })
             console.log(res);
       }})
@@ -147,7 +148,7 @@ class App extends Component {
       } else { 
       return (
         <div className='CoreApp'>
-          <ImageReader className = 'CoreApp' name={this.state.name} id={this.state.userID} logout={this.logout}/>
+          <ImageReader className = 'CoreApp' name={this.state.name} email={this.state.email} entries = {this.state.entries} logout={this.logout}/>
         </div>
     );}
   }

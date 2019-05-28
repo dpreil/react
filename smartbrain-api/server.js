@@ -35,9 +35,8 @@ app.get('/profile/:id', (req,res) => {
 	})
 
 app.put('/image', (req,res) => {
-	const id = parseInt(req.body.id);
-	console.log(id);
-	db('users').where('id','=',id)
+	const {email} = req.body;
+	db('users').where('email','=',email)
 	.increment('entries',1)
 	.returning('entries')
 	.then(()=> res.json('entries updated'))

@@ -17,15 +17,11 @@ class ImageReader extends Component {
     super(props);
     this.state = {
       imgURL: '',
-      box:''
+      box:'',
+      entries:props.entries,
     }
     this.app = new Clarifai.App({apiKey:'37ee56e7f2144e0d873763d314893fa5'});
   }
-  componentDidUpdate(){
-    console.log(this.props.id);
-  }
-  
-
 
   getImg = (event) => {
     event.preventDefault();
@@ -41,14 +37,18 @@ class ImageReader extends Component {
      // console.log(path);
       this.setState({box:path});})
 
+    const entry = this.state.entries+1
     fetch('http://localhost:3001/image', {
           method: 'PUT',
           headers: {'Content-Type':'application/json'},
           body: JSON.stringify(this.props)
         })
         .then(res=>res.json())
+        .then(this.setState({'entries':entry}))
+        .then(console.log(this.state.entries))
         .then(res => console.log(res))
         .catch(err => console.log(err))
+
     }
 
   render(){
@@ -56,7 +56,8 @@ class ImageReader extends Component {
     return (
       <div className="CoreApp">
         <TiltBox/>
-        <div className="welcome">Welcome {this.props.name}. Your rank is #5.</div>
+        <div className="welcome">Welcome {this.props.name}. You have entered {this.state.entries} images.</div>
+        <div className='welcome2'>Please submit an image url and let MagicReader find the face!</div>
         <InputField getIMG={this.getImg} submitImage={this.submitImage}/>
         <ImageBox ImgUrl = {this.state.imgURL} box={this.state.box}/>
         <Logout logout={this.props.logout}/>

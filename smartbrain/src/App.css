@@ -17,10 +17,20 @@
 
 .welcome {
   position: absolute;
-  top:25%;
+  top:20%;
   left:50%;
   width:40%;
   margin: 0 0 0 -20%;
+  color: white;
+  font-size: 1.5em;
+}
+
+.welcome2 {
+  position: absolute;
+  top:28%;
+  left:50%;
+  width:60%;
+  margin: 0 0 0 -30%;
   color: white;
   font-size: 1.5em;
 }
